@@ -1,2 +1,0 @@
-# Burgerbuilder
-Created with CodeSandbox
