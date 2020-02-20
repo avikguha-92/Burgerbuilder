@@ -1,11 +1,17 @@
-import React from "react";
-import Classes from "./styles.module.css";
+import React, { Component } from "react";
+import "./index.css";
+import Layout from "./Components/Layout/Layout";
 
-export default function App() {
-  return (
-    <div className={Classes.App}>
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
-    </div>
-  );
+class App extends Component {
+  render() {
+    return (
+      <div>
+        <Layout>
+          <p>Test</p>
+        </Layout>
+      </div>
+    );
+  }
 }
+
+export default App;
