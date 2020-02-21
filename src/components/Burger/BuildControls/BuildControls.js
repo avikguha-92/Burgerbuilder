@@ -23,6 +23,13 @@ const buildControls = props => (
         disbaled={props.disbaledInfo[ctrl.type]}
       />
     ))}
+    <button
+      disabled={!props.purchasabale}
+      className={Classes.OrderButton}
+      onClick={props.purchasing}
+    >
+      ORDER NOW
+    </button>
   </div>
 );
 export default buildControls;
