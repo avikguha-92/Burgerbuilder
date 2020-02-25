@@ -4,6 +4,8 @@ import Burger from "../../components/Burger/Burger";
 import BuildControls from "../../components/Burger/BuildControls/BuildControls";
 import Modal from "../../components/UI/Modal/Modal";
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
+import axios from "../../axios-orders";
+import Spinner from "../../components/UI/Spinner/Spinner";
 
 const INGREDIENT_PRICES = {
   salad: 0.5,
@@ -14,15 +16,24 @@ const INGREDIENT_PRICES = {
 class BurgerBuilder extends Component {
   state = {
     ingredients: {
-      salad: 0,
-      bacon: 0,
-      cheese: 0,
-      meat: 0
+      salad: null,
+      bacon: null,
+      cheese: null,
+      meat: null
     },
     totalPrice: 4,
     purchasabale: false,
-    purchasing: false
+    purchasing: false,
+    isLoading: false
   };
+
+  componentDidMount() {
+    // axios
+    //   .get("https://react-my-burger-c2e0d.firebaseio.com/ingredients.json")
+    //   .then(response => {
+    //     this.setState({ ingredients: response.data });
+    //   });
+  }
 
   purchaseHandler = () => {
     this.setState({ purchasing: true });
@@ -58,7 +69,25 @@ class BurgerBuilder extends Component {
   };
 
   purchaseContinueHandler = () => {
-    alert("Product is added in cart!");
+    this.setState({ isLoading: true });
+    const orders = {
+      ingredients: this.state.ingredients,
+      price: this.state.totalPrice,
+      customer: {
+        name: "Avik",
+        address: {
+          street: "TestStreet",
+          zipCode: "713205",
+          country: "India"
+        },
+        email: "xyz@zbc.com"
+      },
+      deliveryMethod: "Fastest"
+    };
+    axios
+      .post("/orders.json", orders)
+      .then(this.setState({ isLoading: false, purchasing: false }))
+      .catch(this.setState({ isLoading: false, purchasing: false }));
   };
   removeIngredientHandler = type => {
     const oldCount = this.state.ingredients[type];
@@ -84,28 +113,45 @@ class BurgerBuilder extends Component {
     for (let key in disbaledInfo) {
       disbaledInfo[key] = disbaledInfo[key] <= 0;
     }
+    let orderSummary = null;
+    let burger = <Spinner />;
+
+    if (this.state.ingredients.bacon) {
+      burger = (
+        <Auxiliary>
+          <Burger ingredients={this.state.ingredients} />
+          <BuildControls
+            ingredientAdded={this.addIngredientHandler}
+            ingredientRemoved={this.removeIngredientHandler}
+            disbaledInfo={disbaledInfo}
+            purchasable={this.state.purchasable}
+            ordered={this.purchaseHandler}
+            price={this.state.totalPrice}
+          />
+        </Auxiliary>
+      );
+      orderSummary = (
+        <OrderSummary
+          ingredients={this.state.ingredients}
+          totalPrice={this.state.totalPrice}
+          cancel={this.purchaseCancelHandler}
+          continue={this.purchaseContinueHandler}
+        />
+      );
+    }
+    if (this.state.loading) {
+      orderSummary = <Spinner />;
+    }
+
     return (
       <Auxiliary>
         <Modal
           show={this.state.purchasing}
           modalClosed={this.purchaseCancelHandler}
         >
-          <OrderSummary
-            ingredients={this.state.ingredients}
-            cancel={this.purchaseCancelHandler}
-            continue={this.purchaseContinueHandler}
-            totalPrice={this.state.totalPrice}
-          />
+          {orderSummary}
         </Modal>
-        <Burger ingredients={this.state.ingredients} />
-        <BuildControls
-          ingredientAdded={this.addIngredientHandler}
-          ingredientRemoved={this.removeIngredientHandler}
-          disbaledInfo={disbaledInfo}
-          purchasabale={this.state.purchasabale}
-          purchasing={this.purchaseHandler}
-          price={this.state.totalPrice}
-        />
+        {burger}
       </Auxiliary>
     );
   }
