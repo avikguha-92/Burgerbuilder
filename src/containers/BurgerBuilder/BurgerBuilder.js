@@ -28,11 +28,11 @@ class BurgerBuilder extends Component {
   };
 
   componentDidMount() {
-    // axios
-    //   .get("https://react-my-burger-c2e0d.firebaseio.com/ingredients.json")
-    //   .then(response => {
-    //     this.setState({ ingredients: response.data });
-    //   });
+    axios
+      .get("https://react-my-burger-c2e0d.firebaseio.com/ingredients.json")
+      .then(response => {
+        this.setState({ ingredients: response.data });
+      });
   }
 
   purchaseHandler = () => {
@@ -116,7 +116,12 @@ class BurgerBuilder extends Component {
     let orderSummary = null;
     let burger = <Spinner />;
 
-    if (this.state.ingredients.bacon) {
+    if (
+      this.state.ingredients.bacon !== null ||
+      this.state.ingredients.cheese !== null ||
+      this.state.ingredients.meat !== null ||
+      this.state.ingredients.salad !== null
+    ) {
       burger = (
         <Auxiliary>
           <Burger ingredients={this.state.ingredients} />
